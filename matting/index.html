@@ -1,1 +1,25 @@
-1
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自动抠图-百度前端学院</title>
+    <style>
+        p{
+            margin: 20px 0;
+        }
+        .title{
+            display: inline-block;
+            width: 6em;
+        }
+    </style>
+</head>
+<body>
+<p><span class="title">图片选择：</span><input type="file" value="选择本地图片" id="inputFile" accept="image/png,image/gif,image/jpeg"></p>
+<p><span class="title">显示：</span><input type="range" id="range" value="1" step=".05" min=".1" max="2"><span id="scale">100%</span></p>
+<p><span class="title">当前RGB：</span><span id="rgb"></span></p>
+<canvas id="canvas">
+    您的浏览器不支持canvas
+</canvas>
+<script src="js/index.js"></script>
+</body>
+</html>
