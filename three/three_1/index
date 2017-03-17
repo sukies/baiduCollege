@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>百度前端学院——WebGL No.1 - Three.js 入门</title>
+    <title>百度前端学院——WebGL No. 2 - 光与影</title>
 </head>
 <body onload="init()">
-<canvas id="canvas" width="400" height="300"></canvas>
+<canvas id="canvas" width="500" height="500"></canvas>
 </body>
 <script src="../js/three.js"></script>
 <script>
@@ -18,14 +18,14 @@
         //场景
         var scene = new THREE.Scene();
         //相机
-        var camera = new THREE.OrthographicCamera(-5, 5, -5, 5, 10);
-        camera.position.set(-10, 10, 10);
+        var camera = new THREE.OrthographicCamera(-8, 8, -8, 8, 10);
+        camera.position.set(10, -10, 10);
         camera.lookAt(new THREE.Vector3(0, 0, 0));
         scene.add(camera);
 
         // 光
         var light = new THREE.PointLight(0xffffff);
-        light.position.set(10, -10, -10);
+        light.position.set(-10, 20, -10);
         scene.add(light);
 
         /**
@@ -38,17 +38,18 @@
          emissive是材质的自发光颜色，可以用来表现光源的颜色。
          * **/
         var material = new THREE.MeshLambertMaterial({
-            color: '#00ffff'
+            color: '#ffffff',
+            side: THREE.DoubleSide
         });
 //        长方体
-        var cube = new THREE.Mesh(new THREE.CubeGeometry(4, 3, 2, 10, 10, 10), material);
+        var cube = new THREE.Mesh(new THREE.CubeGeometry(8, 4, 4, 10, 10, 10), material);
         scene.add(cube);
 //        圆环
-        var curile = new THREE.Mesh(new THREE.TorusGeometry(0.5, .2, 12, 18), material);
-        curile.position.set(.8, 1.7, -0.75);
+        var curile = new THREE.Mesh(new THREE.TorusGeometry(.8, .3, 12, 18), material);
+        curile.position.set(-2.5, 2, 2);
         scene.add(curile);
-        var curile2 = new THREE.Mesh(new THREE.TorusGeometry(0.5, .2, 12, 18), material);
-        curile2.position.set(-1.5, 1.7, -.75);
+        var curile2 = new THREE.Mesh(new THREE.TorusGeometry(.8, .3, 12, 18), material);
+        curile2.position.set(2.5, 2, 2);
         scene.add(curile2);
         //渲染
         renderer.render(scene, camera);
