@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>百度前端学院——WebGL No.5 - 动画</title>
+</head>
+<body onload="init()">
+<canvas id="canvas" width="1000" height="1000"></canvas>
+</body>
+<script src="../js/three.js"></script>
+<script src="../js/stats.js"></script>
+<script>
+    function init() {
+        //渲染器
+        var renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById("canvas")
+        });
+        renderer.shadowMapEnabled = true;
+        renderer.shadowMapSoft = true;
+
+        //场景
+        var scene = new THREE.Scene();
+        //相机
+        var camera = new THREE.OrthographicCamera(-60, 60, 60, -60, 1, 200);
+        camera.position.set(20, 30, 100);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene.add(camera);
+
+        //地面
+        var xz = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 10, 10),
+            new THREE.MeshPhongMaterial({color: 0x999999, specular: '#ffffff'})
+        );
+        xz.rotation.x = -Math.PI / 2;
+        xz.position.y = -3;
+        xz.receiveShadow = true;
+        scene.add(xz);
+
+        //小车
+        //贴图
+        var materials = [];
+        for (var i = 1; i <= 6; ++i) {
+            materials.push(new THREE.MeshBasicMaterial({
+                map: THREE.ImageUtils.loadTexture('imgs/bj_0' + i + '.jpg',
+                    {}, function () {
+                        renderer.render(scene, camera);
+                    }),
+                overdraw: true
+            }));
+        }
+
+        var cube = new THREE.Mesh(new THREE.CubeGeometry(8, 4, 4, 10, 10, 10), new THREE.MeshFaceMaterial(materials));
+        cube.castShadow = true;
+
+        scene.add(cube);
+
+        // 轮胎
+        // 材质
+        var material = new THREE.MeshPhongMaterial({
+            color: 0x333333,
+            specular: 0x999999,
+            shininess: 15
+        });
+        var curile = new THREE.Mesh(new THREE.TorusGeometry(.8, .3, 100, 100), material);
+        curile.position.set(-2.5, -1.85, 2.15);
+        curile.castShadow = true;
+        scene.add(curile);
+
+        var curile2 = new THREE.Mesh(new THREE.TorusGeometry(.8, .3, 100, 100), material);
+        curile2.position.set(2.5, -1.85, 2.15);
+        curile2.castShadow = true;
+        scene.add(curile2);
+
+        var curile3 = new THREE.Mesh(new THREE.TorusGeometry(.8, .3, 100, 100), material);
+        curile3.position.set(-2.5, -1.85, -2.15);
+        curile3.castShadow = true;
+        scene.add(curile3);
+        var curile4 = new THREE.Mesh(new THREE.TorusGeometry(.8, .3, 100, 100), material);
+        curile4.position.set(2.5, -1.85, -2.15);
+        curile4.castShadow = true;
+        scene.add(curile4);
+
+
+        // 光
+        var light = new THREE.SpotLight(0xffffff, 1, 100, Math.PI / 6, 25);
+        light.position.set(-5, 8, 25);
+        light.target = cube;
+        light.castShadow = true;
+        scene.add(light);
+
+        var ambient = new THREE.AmbientLight(0x666666);
+        scene.add(ambient);
+        //渲染
+        renderer.render(scene, camera);
+        //动画
+        function Draws(curil) {
+            this.curileAnimation = curil;
+            this.deg = 0;
+            this.R = .5;//三角形外切圆半径
+            this.x = 1;
+            this.z = 0;
+        }
+
+//        改变轨迹
+        Draws.prototype.init = function (deg) {
+            this.deg = deg ? deg + this.deg : this.deg;
+            var x, z, thisDeg;
+            if ((-90 < this.deg && this.deg <= 0) || (270 < this.deg && this.deg <= 360) || this.deg <= -360) {
+                //第四象限；
+                this.deg = (this.deg <= -360) ? this.deg + 360 : this.deg;
+                thisDeg = this.deg > 0 ? 360 - this.deg : -this.deg;
+                z = 2 * this.R * Math.sin(2 * Math.PI / 360 * thisDeg);
+                x = Math.sqrt(1 - z * z);
+
+            } else if ((-180 < this.deg && this.deg <= -90) || (180 < this.deg && this.deg <= 270)) {
+                //第三象限；
+                thisDeg = this.deg > 0 ? this.deg - 180 : 180 + this.deg;
+                z = 2 * this.R * Math.sin(2 * Math.PI / 360 * thisDeg);
+                x = -Math.sqrt(1 - z * z);
+
+            } else if ((-270 < this.deg && this.deg <= -180) || (90 < this.deg && this.deg <= 180)) {
+                //第二象限；
+                thisDeg = this.deg > 0 ? 180 - this.deg : -this.deg - 180;
+                z = -2 * this.R * Math.sin(2 * Math.PI / 360 * thisDeg);
+                x = -Math.sqrt(1 - z * z);
+
+            } else if ((-360 < this.deg && this.deg <= -270) || (0 < this.deg && this.deg <= 90) || this.deg >= 360) {
+                //第一象限；
+                this.deg = (this.deg >= -360) ? this.deg - 360 : this.deg;
+                thisDeg = this.deg > 0 ? this.deg : this.deg + 360;
+                z = -2 * this.R * Math.sin(2 * Math.PI / 360 * thisDeg);
+                x = Math.sqrt(1 - z * z);
+            }
+            this.x = x;
+            this.z = z;
+            for (var i = 0, leg = this.curileAnimation.length; i < leg; i++) {
+                this.curileAnimation[i].rotation.y = (this.curileAnimation[i].rotation.y + 2 * Math.PI / 360 * deg);
+            }
+            Draws.prototype.againDraws(this.curileAnimation, this.x, this.z);
+        };
+        //小车运动
+        Draws.prototype.againDraws = function (body, x, z) {
+            for (var i = 0; i < 4; i++) {
+                body[i].rotation.z = (body[i].rotation.z + 0.01) * (Math.PI * 2);
+                body[i].position.z = body[i].position.z + z;
+                body[i].position.x = body[i].position.x + x;
+            }
+            cube.position.x = cube.position.x + x;
+            cube.position.z = cube.position.z + z;
+            renderer.render(scene, camera);
+        };
+        //前进
+        Draws.prototype.up = function () {
+            Draws.prototype.againDraws(this.curileAnimation, this.x, this.z);
+        };
+        //后退
+        Draws.prototype.down = function () {
+            Draws.prototype.againDraws(this.curileAnimation, -this.x, -this.z);
+        };
+
+        var initDraws = new Draws([curile, curile2, curile3, curile4, cube]);
+        //键盘监听事件
+        document.onkeydown = function (e) {
+            var e = e ? e : window.event;
+            var currKey = e.keyCode || e.which || e.charCode;
+            console.log(currKey);
+            //前进
+            if (currKey == 38 || currKey == 87) {
+                initDraws.up();
+            }
+            else if (currKey == 37 || currKey == 65) {
+                initDraws.init(15);
+                return false;
+            }
+            else if (currKey == 39 || currKey == 68) {
+                initDraws.init(-15);
+                return false;
+            }
+            else if (currKey == 40 || currKey == 83) {
+                initDraws.down();
+                return false;
+            }
+        }
+    }
+
+    //    stats监测
+    var stats = new Stats();
+    stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild(stats.dom);
+
+    function animate() {
+        stats.begin();
+        stats.end();
+        requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+</script>
+</html>
