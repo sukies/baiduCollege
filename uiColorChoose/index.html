@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UI组件之色彩选择器</title>
+    <link type="text/css" rel="stylesheet" href="index.css">
+</head>
+<body>
+<div class="color_chose">
+    <canvas id="color0" width="400" height="400">
+        您的浏览器不支持canvas，请升级浏览器
+    </canvas>
+    <canvas id="color1" width="20" height="400">
+        您的浏览器不支持canvas，请升级浏览器
+    </canvas>
+    <div class="input">
+        <label class="input_list rgb">R<input type="number" value="255" min="0" max="255" step="1" id="rgb_0"
+                                              oninput="rgbInput()"></label>
+        <label class="input_list rgb">G<input type="number" value="0" min="0" max="255" step="1" id="rgb_1"
+                                              oninput="rgbInput()"></label>
+        <label class="input_list rgb">B<input type="number" value="0" min="0" max="255" step="1" id="rgb_2"
+                                              oninput="rgbInput()"></label>
+        <label class="input_list hsl">H<input type="number" value="0" min="0" max="1" id="hsl_0"
+                                              oninput="hslInput()"></label>
+        <label class="input_list hsl">S<input type="number" value="0" min="0" max="1" id="hsl_1"
+                                              oninput="hslInput()"></label>
+        <label class="input_list hsl">L<input type="number" value="0" min="0" max="1" id="hsl_2"
+                                              oninput="hslInput()"></label>
+    </div>
+</div>
+<script>
+    var input = document.getElementsByTagName('input');
+    //渐变1
+
+    var canvasOne = function () {
+        var that = this;
+        this.canvas = document.getElementById('color0');
+        this.ctx = this.canvas.getContext("2d");
+        this.r = null;
+        this.g = null;
+        this.b = null;
+        //canvas0点击事件
+        this.canvas.addEventListener("click", function (evt) {
+            var mousePos = getMousePos(that.canvas, evt);
+            var imgData = that.ctx.getImageData(mousePos.x, mousePos.y, 1, 1);
+            that.drew(that.r, that.g, that.b);
+            that.ctx.beginPath();
+            that.ctx.arc(mousePos.x, mousePos.y, 5, 0, 2 * Math.PI);
+            that.ctx.strokeStyle = "#ff0000";
+            that.ctx.stroke();
+            input[0].value = imgData['data'][0];
+            input[1].value = imgData['data'][1];
+            input[2].value = imgData['data'][2];
+            var hls = rgbToHsl(imgData['data'][0], imgData['data'][1], imgData['data'][2]);
+            console.log(hls);
+            input[3].value = hls[0].toFixed(2);
+            input[4].value = hls[1].toFixed(2);
+            input[5].value = hls[2].toFixed(2);
+        });
+        this.drew();
+    };
+    //canvas1绘制
+    canvasOne.prototype.drew = function (r, g, b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.ctx.clearRect(0, 0, 400, 400);
+        //定义渐变
+        var gradient0 = this.ctx.createLinearGradient(0, 0, 400, 400);
+        gradient0.addColorStop(0, "#fff");
+        gradient0.addColorStop(0.5, (r || g || b) ? "rgb(" + r + "," + g + "," + b + ")" : '#ff0000');
+        gradient0.addColorStop(1, '#000');
+        this.ctx.clearRect(0, 0, 400, 400);
+        this.ctx.fillStyle = gradient0;
+        this.ctx.fillRect(0, 0, 400, 400);
+    };
+    var canvae1 = new canvasOne();
+    canvae1.drew();
+
+    //渐变2
+    var canvasTwo = function () {
+        var that = this;
+        this.canvas = document.getElementById('color1');
+        this.ctx = this.canvas.getContext("2d");
+        //设置渐变
+        this.gradient1 = this.ctx.createLinearGradient(0, 0, 20, 400);
+        this.gradient1.addColorStop(0, "rgba(255,0,0,0.8)");
+        this.gradient1.addColorStop(.20, "rgba(255,255,0,0.8)");
+        this.gradient1.addColorStop(.40, "rgba(0,255,0,0.8)");
+        this.gradient1.addColorStop(.60, "rgba(0,255,255,0.8)");
+        this.gradient1.addColorStop(.80, 'rgba(0,0,255,0.8)');
+        this.gradient1.addColorStop(1, 'rgba(255,0,0,0.8)');
+        //点击事件
+        this.canvas.addEventListener("click", function (evt) {
+            var mousePos = getMousePos(that.canvas, evt);
+            var imgData = that.ctx.getImageData(mousePos.x, mousePos.y, 1, 1);
+            //重绘
+            canvae1.drew(imgData['data'][0], imgData['data'][1], imgData['data'][2]);
+            canvas2.drew(mousePos.x, mousePos.y);
+        }, false);
+    };
+    //        绘图
+    canvasTwo.prototype.drew = function (x, y) {
+        this.ctx.clearRect(0, 0, 20, 400);
+        this.ctx.fillStyle = this.gradient1;
+        this.ctx.fillRect(0, 0, 20, 400);
+        //小园圈
+        this.ctx.beginPath();
+        this.ctx.arc(10, y, 5, 0, 2 * Math.PI);
+        this.ctx.strokeStyle = "#ff0000";
+        this.ctx.stroke();
+    };
+    var canvas2 = new canvasTwo();
+    canvas2.drew();
+
+    //获取鼠标在canvas中的位置
+    function getMousePos(canvas, evt) {
+        console.log(canvas);
+        var rect = canvas.getBoundingClientRect();
+        return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+        };
+    }
+    //输入框输入事件rgb
+    function rgbInput() {
+        var r = input[0].value;
+        var g = input[1].value;
+        var b = input[2].value;
+        if ((0 <= r && r <= 255) && (0 <= g && g <= 255) && (0 <= b && b <= 255)) {
+            canvae1.drew(r, g, b);
+            var hls = rgbToHsl(r, g, b);
+            input[3].value = hls[0].toFixed(2);
+            input[4].value = hls[1].toFixed(2);
+            input[5].value = hls[2].toFixed(2);
+        }
+    }
+    //输入框输入事件rgb
+    function hslInput() {
+        var h = Number(input[3].value);
+        var s = Number(input[4].value);
+        var l = Number(input[5].value);
+
+        if ((0 <= h && h <= 1) && (0 <= s && s <= 1) && (0 <= l && l <= 1)) {
+            var rgb = hslToRgb(h, s, l);
+            canvae1.drew(rgb[0], rgb[1], rgb[2]);
+            input[0].value = rgb[0].toFixed(0);
+            input[1].value = rgb[1].toFixed(0);
+            input[2].value = rgb[2].toFixed(0);
+        }
+
+    }
+    //==========================颜色转换(摘自张鑫旭博客)
+    // http://www.zhangxinxu.com/wordpress/2010/03/javascript-hex-rgb-hsl-color-convert/
+    //    RGB转HSL
+    /**
+     * HSL颜色值转换为RGB.
+     * 换算公式改编自 http://en.wikipedia.org/wiki/HSL_color_space.
+     * h, s, 和 l 设定在 [0, 1] 之间
+     * 返回的 r, g, 和 b 在 [0, 255]之间
+     *
+     * @param   Number  h       色相
+     * @param   Number  s       饱和度
+     * @param   Number  l       亮度
+     * @return  Array           RGB色值数值
+     */
+    function hslToRgb(h, s, l) {
+        var r, g, b;
+
+        if (s == 0) {
+            r = 1; // achromatic
+            b = 1;
+            g = 1;
+        } else {
+            var hue2rgb = function hue2rgb(p, q, t) {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1 / 6) return p + (q - p) * 6 * t;
+                if (t < 1 / 2) return q;
+                if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                return p;
+            }
+
+            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            var p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1 / 3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1 / 3);
+        }
+
+        return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    }
+
+
+    //    RGB转HSL
+
+    /**
+     * RGB 颜色值转换为 HSL.
+     * 转换公式参考自 http://en.wikipedia.org/wiki/HSL_color_space.
+     * r, g, 和 b 需要在 [0, 255] 范围内
+     * 返回的 h, s, 和 l 在 [0, 1] 之间
+     *
+     * @param   Number  r       红色色值
+     * @param   Number  g       绿色色值
+     * @param   Number  b       蓝色色值
+     * @return  Array           HSL各值数组
+     */
+    function rgbToHsl(r, g, b) {
+        r /= 255, g /= 255, b /= 255;
+        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var h, s, l = (max + min) / 2;
+
+        if (max == min) {
+            h = s = 0; // achromatic
+        } else {
+            var d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r:
+                    h = (g - b) / d + (g < b ? 6 : 0);
+                    break;
+                case g:
+                    h = (b - r) / d + 2;
+                    break;
+                case b:
+                    h = (r - g) / d + 4;
+                    break;
+            }
+            h /= 6;
+        }
+
+        return [h, s, l];
+    }
+</script>
+</body>
+</html>
