@@ -11,8 +11,8 @@
 <a href='./uiColorChoose/index.html'>uiColorChoose</a>
 
 <h3>three</h3>
-<a href='./three/three_1/index.html'>three_1</a></br>
-<a href='./three/three_2/index.html'>three_2</a></br>
-<a href='./three/three_3/index.html'>three_3</a></br>
-<a href='./three/three_4/index.html'>three_4</a></br>
-<a href='./three/three_5/index.html'>three_5</a></br>
+<a href='./three/three_1/index.html'>百度前端学院——Three.js 入门</a></br>
+<a href='./three/three_2/index.html'>百度前端学院——WebGL No. 2 - 光与影</a></br>
+<a href='./three/three_3/index.html'>百度前端学院——WebGL No. 3 - 材质与纹理</a></br>
+<a href='./three/three_4/index.html'>百度前端学院——WebGL No. 4 - 照相机和交互控制</a></br>
+<a href='./three/three_5/index.html'>百度前端学院——WebGL No.5 - 动画</a></br>
