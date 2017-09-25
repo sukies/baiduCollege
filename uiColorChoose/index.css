@@ -1,0 +1,43 @@
+.color_chose{
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+#color0,#color1,.input{
+    height: 400px;
+    border: 1px solid #ddd;
+}
+#color0{
+    width: 400px;
+}
+#color1{
+    width: 20px;
+    margin: 0 10px;
+}
+.input{
+    width: 200px;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-flow: column   ;
+    -ms-flex-flow: column   ;
+    flex-flow: column   ;
+}
+.input .input_list{
+    -webkit-flex:1;
+    -moz-flex:1;
+    flex:1;
+
+    line-height: 100%;
+}
+img{
+    display: none;
+}
+label{
+    margin: 10px auto auto 20px;
+}
+input{
+    width: 80px;
+    line-height: 30px;
+    margin: 0 10px;
+}
